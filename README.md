@@ -1,4 +1,4 @@
-## Insert-paginator плагин для CakePHP CakePHP
+## Insert-paginator плагин для CakePHP.
 
 ### Что может этот плагин?
 
@@ -96,7 +96,7 @@ Html вёрстка кнопки или ссылки, нажав на котор
 
 ### Различные варианты настройки этого веб-компонента.
 
-1. Классический пагинатор.
+#### Классический пагинатор.
 
 В этом случае, при первой загрузке страницы загружается часть пагинации и показывается кнопка (ссылка) пагинации.
 
@@ -130,8 +130,8 @@ a) Постройку пагинации необходимо начинать �
 ```php
 <?php echo
     $this->Webcomp->insertPaginator([
-        'contentTrubber' => '<div class="insert-tr">Это труббер!</div>',
-        'contentButton'  => '<button class="insert-but">Кнопка</button>',
+        'contentTrubber' => '<div class="insert-tr">Вёрстка труббера!</div>',
+        'contentButton'  => '<button class="insert-but">Кнопка!</button>',
         'contentHTML'    => $this->element('pag_users', ['users' => $users]),// Наш созданный элемент `pag_users`.
 
         // Настройки по умолчанию, которые можно не указывать:
@@ -148,23 +148,27 @@ a) Постройку пагинации необходимо начинать �
 ```php
 use Cake\ORM\Locator\LocatorAwareTrait;
 
-public $paginate = ['limit' => 3];
-
-/**
- * Index method
- *
- * @return \Cake\Http\Response|null|void Renders view
- */
-public function index()
+class IndexController extends AppController
 {
-    $query = $this->getTableLocator()->get('Users');
-    $users = $this->paginate( $query->find() );
-    $this->set( compact('users') );
+    public $paginate = ['limit' => 3];
 
-    if ($this->request->is('ajax')) {
-        $this->viewBuilder()->setLayout('ajax');
-        return $this->render('/element/pag_users');
+    /**
+     * Index method
+     *
+     * @return \Cake\Http\Response|null|void Renders view
+     */
+    public function index()
+    {
+        $query = $this->getTableLocator()->get('Users');
+        $users = $this->paginate( $query->find() );
+        $this->set( compact('users') );
+
+        if ($this->request->is('ajax')) {
+            $this->viewBuilder()->setLayout('ajax');
+            return $this->render('/element/pag_users');
+        }
     }
+...
 }
 ```
 

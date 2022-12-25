@@ -251,6 +251,7 @@ export default class InsertPaginator extends HTMLElement {
                 replace.outerHTML = html;
                 mythis.init();
                 mythis.triggerAjax = false;
+                if ( mythis.eventPaginator == 'auto' ) mythis.getIntoArea();
             },
             //error: function( status, statusText ) {},
             //errorConnect: function() {},

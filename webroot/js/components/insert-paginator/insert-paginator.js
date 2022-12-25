@@ -11,9 +11,14 @@ import Ajax from '../../../../Extensions/js/components/ext/ajax.js';
 export default class InsertPaginator extends HTMLElement {
 
     /**
-     * 
+     * Значение скрытого поля 'page'.
      */
     valuePage = null;
+
+    /**
+     * Указывает на запущенный AJAX-запрос.
+     */
+    triggerAjax = false;
 
     /**
      * Конструктор.
@@ -152,17 +157,56 @@ export default class InsertPaginator extends HTMLElement {
         this.init();
         // СОБЫТИЯ:
         if ( this.insertButtonTrubber == 'out' ) {
-            this.eventClickButton();
+            this.eventPag();
         }
     }
 
     /**
-     * Устанавливает событие на кнопку (ссылку).
+     * Устанавливает, в зависимости от настроек, событие пагинации.
+     */
+    eventPag() {
+        if ( this.eventPaginator == 'click' ) {
+            this.eventClickButton();
+        }
+        if ( this.eventPaginator == 'auto' ) {
+            this.eventAutoPag();
+        }
+    }
+
+    /**
+     * Устанавливает событие 'click' на кнопку (ссылку).
      */
     eventClickButton() {
         let button = this.root.querySelector('.insert-but');
         if ( button ) {
-            button.addEventListener('click', (e) => this.query(e));
+            button.addEventListener('click', (e) => this.query());
+        }
+    }
+
+    /**
+     * Устанавливает событие автоматического запуска пагинации.
+     */
+    eventAutoPag() {
+        this.getIntoArea();
+        window.addEventListener('scroll', (e) => {
+            this.getIntoArea();
+        });
+    }
+
+    /**
+     * Проверяет отображение элемента (объекта) в области окна экрана.
+     */
+    getIntoArea() {
+        let heightWinBrowser = document.documentElement.clientHeight;
+        let button = this.root.querySelector('.insert-but');
+        if ( button ) {
+            let domRect = button.getBoundingClientRect();
+            let t = Math.floor( domRect.top );
+            if ( t < heightWinBrowser && (t + Math.floor(domRect.height) > 0 ) ) {
+                if ( !this.triggerAjax ) {
+                    this.query();
+                }
+            }
         }
     }
 
@@ -187,24 +231,26 @@ export default class InsertPaginator extends HTMLElement {
             trubber.remove();
         }
         if ( this.insertButtonTrubber == 'in' ) {
-            this.eventClickButton();
+            this.eventPag();
         }
     }
 
     /**
      * AJAX-запрос на сервер.
      */
-    query(e) {
+    query() {
         let mythis = this;
         Ajax.connect({
             url: mythis.valuePage,
             beforeSend: function() {
                 mythis.classButTr = 'tr';
+                mythis.triggerAjax = true;
             },
             success: function(html) {
                 let replace = mythis.root.querySelector('.replace');
                 replace.outerHTML = html;
                 mythis.init();
+                mythis.triggerAjax = false;
             },
             //error: function( status, statusText ) {},
             //errorConnect: function() {},

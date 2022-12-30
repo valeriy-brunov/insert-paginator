@@ -44,6 +44,15 @@ bin/cake plugin load Insert-paginator
 Для каждого режима вставки предусмотренны свои настройки:
 
 > __Режим `paginator`__
+```php
+<?php echo
+    $this->Webcomp->insertPaginator([
+        'contentHTML' => 'Содержимое, которое покажется на странице после её первой загрузки.',
+        'contentTrubber' => 'Html вёрстка труббера. Внешний слой труббера должен содержать класс `insert-tr`.',
+        ...
+    ]);
+?>
+```
 
 
 #### url

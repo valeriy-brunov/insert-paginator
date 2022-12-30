@@ -47,13 +47,68 @@ bin/cake plugin load Insert-paginator
 ```php
 <?php echo
     $this->Webcomp->insertPaginator([
+
+        // Обязательные настройки:
+        'insertType' => 'paginator',
         'contentHTML' => 'Содержимое, которое покажется на странице после её первой загрузки.',
-        'contentTrubber' => 'Html вёрстка труббера. Внешний слой труббера должен содержать класс `insert-tr`.',
-        ...
+        'contentTrubber' => 'Html вёрстка труббера. Внешний слой труббера должен содержать класс "insert-tr".',
+        'contentButton' => 'Html вёрстка кнопки (ссылки). Должна содержать класс "insert-but".',
+        
+        // Не обязательные настройки:
+        'insertButtonTrubber' => '
+            Куда вставлять кнопку и труббер: внутрь блока с классом "replace" - значение "in" или за пределы блока `replace`:
+            тогда значение будет равно `out`. Обычно, если внутрь кнопки для продоления пагинации необходимо вставить некоторую
+            надпись, которая должна сформироваться на сервере, используют значение "in". По умолчанию установлено
+            значение "out".',
+        'insertContent' => 'Куда вставлять контент:
+            "top" - вверх (по умолчанию). В этом случае пагинация будет идти сверху-вниз;
+            "bottom" - вниз. В этом случае пагинация будет идти снизу-вверх.',
+        'eventPaginator' => 'Тип события, после которого будет запрошена следующая партия контента:
+            "click" - щелчок для кнопки или ссылки (по умолчанию);
+            "auto" - пагинация срабатывает автоматически на странице.',
     ]);
 ?>
 ```
 
+Шаблон для копирования и вставки в ваш php-код:
+
+```php
+<?php echo
+    $this->Webcomp->insertPaginator([
+        'insertType' => 'paginator',
+        'contentHTML' => '',
+        'contentTrubber' => '',
+        'contentButton' => '',
+        'insertButtonTrubber' => '',
+        'insertContent' => '',
+        'eventPaginator' => '',
+    ]);
+?>
+```
+
+> __Режим `load`__
+
+```php
+<?php echo
+    $this->Webcomp->insertPaginator([
+        'insertType' => 'load',
+        'url' => 'Адрес AJAX-запроса.',
+        'contentTrubber' => 'Html вёрстка труббера. Внешний слой труббера должен содержать класс "insert-tr".',
+    ]);
+?>
+```
+
+Шаблон для копирования и вставки в ваш php-код:
+
+```php
+<?php echo
+    $this->Webcomp->insertPaginator([
+        'insertType' => 'load',
+        'url' => '',
+        'contentTrubber' => '',
+    ]);
+?>
+```
 
 #### url
 

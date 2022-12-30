@@ -33,6 +33,7 @@
                 'show' => ($attr[0]['insertButtonTrubber'] == 'in') ? 'top' : 'center',
                 'contentTrubber' => $attr[0]['contentTrubber'] ?? '',
                 'contentButton' => $attr[0]['contentButton'] ?? '',
+                'insertType' => $attr[0]['insertType'],
             ]);
         ?>
     <?php endif; ?>
@@ -50,6 +51,7 @@
                 'show' => ($attr[0]['insertButtonTrubber'] == 'in') ? 'bottom' : 'center',
                 'contentTrubber' => $attr[0]['contentTrubber'] ?? '',
                 'contentButton' => $attr[0]['contentButton'] ?? '',
+                'insertType' => $attr[0]['insertType'],
             ]);
         ?>
         <?= ($attr[0]['contentHTML'] ?? '' ) ?>
@@ -66,15 +68,8 @@
 
 <?php
     // Служебные атрибуты:
-    if (
-        isset($attr[0]['insertType']) and
-        (
-            $attr[0]['insertType'] == 'load' or
-            $attr[0]['insertType'] == 'load-paginator' or
-            $attr[0]['insertType'] == 'insert-load'
-        )
-    ) {
-        $attr[0]['class']  = 'trubber';
+    if ( isset($attr[0]['insertType']) and $attr[0]['insertType'] == 'load' ) {
+        $attr[0]['class']  = 'tr';
     }
 ?>
 
@@ -83,7 +78,7 @@
     if ( isset($attr[0]['contentTrubber']) or empty($attr[0]['contentTrubber']) ) unset($attr[0]['contentTrubber']);
     if ( isset($attr[0]['contentButton']) or empty($attr[0]['contentButton']) ) unset($attr[0]['contentButton']);
     if ( isset($attr[0]['contentHTML']) or empty($attr[0]['contentHTML']) ) unset($attr[0]['contentHTML']);
-    unset($attr[0]['insertType']);
+    //unset($attr[0]['insertType']);
     unset($attr[0]['insertContent']);
     // unset($attr[0]['insertButtonTrubber']);
 ?>

@@ -18,13 +18,15 @@
             echo $contentButton ?? '';
         }
     ?>
-    <?php
-        $this->Paginator->setTemplates([
-            'nextActive' => '<input type="hidden" name="page" value="{{url}}">',
-            'nextDisabled' => '',
-        ]);
-    ?>
-    <?= $this->Paginator->next() ?>
+    <?php if ( (isset($insertType) and $insertType == 'paginator') or !isset($insertType) ): ?>
+        <?php
+            $this->Paginator->setTemplates([
+                'nextActive' => '<input type="hidden" name="page" value="{{url}}">',
+                'nextDisabled' => '',
+            ]);
+        ?>
+        <?= $this->Paginator->next() ?>
+    <?php endif; ?>
     <?php
         if ( isset($show) and $show == 'bottom' ) {
             echo $contentButton ?? '';

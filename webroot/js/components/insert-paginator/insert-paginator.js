@@ -129,23 +129,57 @@ export default class InsertPaginator extends HTMLElement {
     }
 
     /**
+     * Атрибут "url".
+     */
+    set url( val ) {
+        this.setAttribute( 'url', val );
+    }
+    get url() {
+        if ( this.hasAttribute( 'url' ) ) {
+            return this.getAttribute( 'url' );
+        }
+        else return InsertPaginator.DEFAULT_URL;
+    }
+    static get DEFAULT_URL() {
+        return false;
+    }
+
+    /**
+     * Атрибут "insertType".
+     */
+    set insertType( val ) {
+        this.setAttribute( 'insertType', val );
+    }
+    get insertType() {
+        if ( this.hasAttribute( 'insertType' ) ) {
+            return this.getAttribute( 'insertType' );
+        }
+        else return InsertPaginator.DEFAULT_INSERTTYPE;
+    }
+    static get DEFAULT_INSERTTYPE() {
+        return 'paginator';
+    }
+
+    /**
      * Определяем, за какими атрибутами необходимо наблюдать.
      */
     static get observedAttributes() {
-        //return ['Имя атрибута'];
+        //return ['url'];
     }
 
     /**
      * Следим за изменениями этих атрибутов и отвечаем соответственно.
      */
     attributeChangedCallback( name, oldVal, newVal ) {
-        switch( name ) {
-            case 'Имя атрибута':
-                // Выполняемый код.
+        /*switch( name ) {
+            case 'url':
+    alert();
+                this.valuePage = this.url;
+                this.query();
                 break;
-            case 'Имя атрибута':
-            // Выполняемый код.
-            break;
+        }*/
+        if ( name == 'url' ) {
+            console.log(name);
         }
     }
 
@@ -154,14 +188,23 @@ export default class InsertPaginator extends HTMLElement {
      * (может вызываться много раз, если элемент многократно добавляется/удаляется).
      */
     connectedCallback() {
-        this.init();
-        // СОБЫТИЯ:
-        if ( this.insertButtonTrubber == 'out' ) {
-            this.eventPag();
+        switch( this.insertType ) {
+            case 'load':
+                if ( this.url ) {
+                    this.valuePage = this.url;
+                    this.query();
+                }
+                break;
+            case 'paginator':
+                this.nextPag();
+                this.eventPag();
+                break;
         }
     }
 
     /**
+     * Для 'insertType' => 'paginator'.
+     *
      * Устанавливает, в зависимости от настроек, событие пагинации.
      */
     eventPag() {
@@ -174,6 +217,10 @@ export default class InsertPaginator extends HTMLElement {
     }
 
     /**
+     * Для:
+     *  'insertType' => 'paginator'
+     *  'eventPaginator' => 'click'
+     *
      * Устанавливает событие 'click' на кнопку (ссылку).
      */
     eventClickButton() {
@@ -184,13 +231,15 @@ export default class InsertPaginator extends HTMLElement {
     }
 
     /**
+     * Для:
+     *  'insertType' => 'paginator'
+     *  'eventPaginator' => 'auto'
+     *
      * Устанавливает событие автоматического запуска пагинации.
      */
     eventAutoPag() {
         this.getIntoArea();
-        window.addEventListener('scroll', (e) => {
-            this.getIntoArea();
-        });
+        window.addEventListener('scroll', (e) => this.getIntoArea());
     }
 
     /**
@@ -211,14 +260,12 @@ export default class InsertPaginator extends HTMLElement {
     }
 
     /**
-     * При добавлении новой порции html-кода, необходимо вызывать данную функцию.
-     * Ищет скрытое поле с атрибутом "name" равным "page", при необходимости показывает кнопку
+     * Ищет скрытое поле с атрибутом "name" равным "page", при необходимости показывает кнопку (ссылку)
      * пагинации или, при отсутствии скрытого поля, заканчивает пагинацию - удаляя кнопку
      * пагинации и труббер.
      */
-    init() {
-        let replace = this.root.querySelector('.replace');
-        let page = replace.querySelector('input[name="page"]');
+    nextPag() {
+        let page = this.root.querySelector('input[name="page"]');
         if ( page ) {
             this.valuePage = page.getAttribute('value');
             this.classButTr = 'but';
@@ -230,9 +277,6 @@ export default class InsertPaginator extends HTMLElement {
             button.remove();
             trubber.remove();
         }
-        if ( this.insertButtonTrubber == 'in' ) {
-            this.eventPag();
-        }
     }
 
     /**
@@ -243,18 +287,29 @@ export default class InsertPaginator extends HTMLElement {
         Ajax.connect({
             url: mythis.valuePage,
             beforeSend: function() {
-                mythis.classButTr = 'tr';
                 mythis.triggerAjax = true;
+                if ( mythis.insertType == 'paginator' ) {
+                    mythis.classButTr = 'tr';
+                }
             },
             success: function(html) {
-                let replace = mythis.root.querySelector('.replace');
-                replace.outerHTML = html;
-                mythis.init();
+                if ( mythis.insertType == 'paginator' ) {
+                    let replace = mythis.root.querySelector('.replace');
+                    replace.outerHTML = html;
+                    mythis.nextPag();
+                    if ( mythis.eventPaginator == 'auto' ) {
+                        mythis.getIntoArea();
+                    }
+                }
+                if ( mythis.insertType == 'load' ) {
+                    mythis.classButTr = null;
+                    let replace = mythis.root.querySelector('.replace');
+                    replace.outerHTML = html;
+                }
                 mythis.triggerAjax = false;
-                if ( mythis.eventPaginator == 'auto' ) mythis.getIntoArea();
             },
-            //error: function( status, statusText ) {},
-            //errorConnect: function() {},
+            error: function( status, statusText ) {},
+            errorConnect: function() {},
         });
     }
 }

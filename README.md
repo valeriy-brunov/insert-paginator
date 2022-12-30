@@ -48,7 +48,7 @@ bin/cake plugin load Insert-paginator
 Для каждого режима вставки предусмотренны свои настройки:
 
 <a name="pag"></a>
-> __Режим `paginator`__
+> :memo: __Режим `paginator`__
 ```php
 <?php echo
     $this->Webcomp->insertPaginator([
@@ -91,7 +91,7 @@ bin/cake plugin load Insert-paginator
 ?>
 ```
 <a name="load"></a>
-> __Режим `load`__
+> :memo: __Режим `load`__
 
 ```php
 <?php echo

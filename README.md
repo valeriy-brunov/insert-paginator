@@ -43,7 +43,7 @@ bin/cake plugin load Insert-paginator
 
 Для каждого режима вставки предусмотренны свои настройки:
 
-> #### Режим `paginator`
+> __Режим `paginator`__
 
 
 #### url

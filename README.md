@@ -49,6 +49,7 @@ bin/cake plugin load Insert-paginator
 
 <a name="pag"></a>
 > :memo: __Режим `paginator`__
+
 ```php
 <?php echo
     $this->Webcomp->insertPaginator([
@@ -70,7 +71,7 @@ bin/cake plugin load Insert-paginator
             "bottom" - вниз. В этом случае пагинация будет идти снизу-вверх.',
         'eventPaginator' => 'Тип события, после которого будет запрошена следующая партия контента:
             "click" - щелчок для кнопки или ссылки (по умолчанию);
-            "auto" - пагинация срабатывает автоматически на странице.',
+            "auto" - пагинация срабатывает на странице автоматически.',
     ]);
 ?>
 ```
@@ -81,7 +82,7 @@ bin/cake plugin load Insert-paginator
 <?php echo
     $this->Webcomp->insertPaginator([
         'insertType' => 'paginator',
-        'contentHTML' => '',
+        'contentHTML' => $this->element(),
         'contentTrubber' => '',
         'contentButton' => '',
         'insertButtonTrubber' => '',
@@ -141,8 +142,8 @@ bin/cake plugin load Insert-paginator
 <?php endif;?>
 ```
 
-В файл вида вставляем и настраиваем веб компонент `Insert-paginator`: для настройки `contentHTML` указываем
-содержимое только что созданного элемента.
+В файл вида вставляем и настраиваем веб компонент `Insert-paginator`:
+для настройки `contentHTML` указываем содержимое только что созданного элемента.
 
 ```php
 <?php echo
@@ -158,7 +159,9 @@ bin/cake plugin load Insert-paginator
 Теперь в контроллёре, который относится к виду, необходимо настроить пагинацию листинга:
 
 ```php
+...
 use Cake\ORM\Locator\LocatorAwareTrait;
+...
 
 class IndexController extends AppController
 {
@@ -183,11 +186,14 @@ class IndexController extends AppController
 ...
 }
 ```
+
 Можно создать пагинатор с автоматическим режимом пагинации. Для этого необходимо в настройках
 веб-компонента указать:
 
 ```php
+...
 'eventPaginator' => 'auto',
+...
 ```
 
 Если для автоматической пагинации кнопка (ссылка) не нужна, то вместо неё необходимо указать пустой `div`:
@@ -203,7 +209,7 @@ class IndexController extends AppController
 <?php echo
     $this->Webcomp->insertPaginator([
         'insertType' => 'load',
-        'url' => 'Адрес AJAX-запроса.',
+        'url' => 'Адрес AJAX-запроса. Например, /gotovo/index/test',
         'contentTrubber' => 'Html вёрстка труббера. Внешний слой труббера должен содержать класс "insert-tr".',
     ]);
 ?>
@@ -221,18 +227,27 @@ class IndexController extends AppController
 ?>
 ```
 
-#### Вставка контента по указанному `url`.
-
-При первой загрузке страницы показывается труббер, а после загрузки контента, по указанному url, вставляется
-контент. В этом случае веб-элемент будет иметь следующие настройки:
+Для работы в таком режиме необходимо в контроллёре переключить `Layout` на `ajax`:
 
 ```php
-<?php echo
-    $this->Webcomp->insertPaginator([
-        'url' => '/gotovo/index/test',
-        'contentTrubber' => '<div class="insert-tr">Вёрстка труббера!</div>',
-        'insertType' => 'load',
-    ]);
-?>
+...
+$this->viewBuilder()->setLayout('ajax');
+...
 ```
+
+Тогда веб-компонент в режиме `load` внутрь себя вставит вид, относящийся к контроллёру.
+
+При изменение атрибута `url` у уже выведенного веб-компонента в режиме `load` происходит загрузка
+нового содержимого по установленному адресу. Если контент веб-компонента планируется обновлять
+(изменять атрибут `url`), то необходимо содержимое вида заключить в обёртку с классом `replace`:
+
+```php
+<div class="replace">
+    <!-- Содержимое. -->
+</div>
+```
+
+
+
+
 

@@ -164,22 +164,18 @@ export default class InsertPaginator extends HTMLElement {
      * Определяем, за какими атрибутами необходимо наблюдать.
      */
     static get observedAttributes() {
-        //return ['url'];
+        return ['url'];
     }
 
     /**
      * Следим за изменениями этих атрибутов и отвечаем соответственно.
      */
     attributeChangedCallback( name, oldVal, newVal ) {
-        /*switch( name ) {
-            case 'url':
-    alert();
-                this.valuePage = this.url;
-                this.query();
-                break;
-        }*/
-        if ( name == 'url' ) {
-            console.log(name);
+        if ( name == 'url' && this.insertType == 'load' && oldVal ) {
+            if ( this.url ) {
+                    this.valuePage = this.url;
+                    this.query();
+                }
         }
     }
 
@@ -196,15 +192,11 @@ export default class InsertPaginator extends HTMLElement {
                 }
                 break;
             case 'paginator':
-                this.nextPag();
-                this.eventPag();
-                break;
+                this.eventPag( this.nextPag() );
         }
     }
 
     /**
-     * Для 'insertType' => 'paginator'.
-     *
      * Устанавливает, в зависимости от настроек, событие пагинации.
      */
     eventPag() {
@@ -217,10 +209,6 @@ export default class InsertPaginator extends HTMLElement {
     }
 
     /**
-     * Для:
-     *  'insertType' => 'paginator'
-     *  'eventPaginator' => 'click'
-     *
      * Устанавливает событие 'click' на кнопку (ссылку).
      */
     eventClickButton() {
@@ -231,19 +219,19 @@ export default class InsertPaginator extends HTMLElement {
     }
 
     /**
-     * Для:
-     *  'insertType' => 'paginator'
-     *  'eventPaginator' => 'auto'
-     *
      * Устанавливает событие автоматического запуска пагинации.
      */
     eventAutoPag() {
-        this.getIntoArea();
-        window.addEventListener('scroll', (e) => this.getIntoArea());
+        if ( this.getIntoArea() ) this.query();
+        window.addEventListener('scroll', (e) => {
+            if ( this.getIntoArea() ) this.query();
+        });
     }
 
     /**
      * Проверяет отображение элемента (объекта) в области окна экрана.
+     * 
+     * @return true|false Элемент отображён|Элемент не отображён
      */
     getIntoArea() {
         let heightWinBrowser = document.documentElement.clientHeight;
@@ -253,8 +241,9 @@ export default class InsertPaginator extends HTMLElement {
             let t = Math.floor( domRect.top );
             if ( t < heightWinBrowser && (t + Math.floor(domRect.height) > 0 ) ) {
                 if ( !this.triggerAjax ) {
-                    this.query();
+                    return true;
                 }
+                else return false;
             }
         }
     }
@@ -288,25 +277,25 @@ export default class InsertPaginator extends HTMLElement {
             url: mythis.valuePage,
             beforeSend: function() {
                 mythis.triggerAjax = true;
-                if ( mythis.insertType == 'paginator' ) {
+                if ( mythis.insertType == 'paginator' || mythis.insertType == 'load' ) {
                     mythis.classButTr = 'tr';
                 }
             },
             success: function(html) {
+                mythis.triggerAjax = false;
                 if ( mythis.insertType == 'paginator' ) {
                     let replace = mythis.root.querySelector('.replace');
                     replace.outerHTML = html;
                     mythis.nextPag();
                     if ( mythis.eventPaginator == 'auto' ) {
-                        mythis.getIntoArea();
+                        if ( mythis.getIntoArea() ) mythis.query();
                     }
                 }
-                if ( mythis.insertType == 'load' ) {
+                else if ( mythis.insertType == 'load' ) {
                     mythis.classButTr = null;
                     let replace = mythis.root.querySelector('.replace');
                     replace.outerHTML = html;
                 }
-                mythis.triggerAjax = false;
             },
             error: function( status, statusText ) {},
             errorConnect: function() {},

@@ -1,6 +1,6 @@
 {
     "name": "valeriy-brunov/insert-paginator",
-    "description": "Insert-paginator plugin for CakePHP",
+    "description": "Создаёт AJAX-пагинацию или вставку в нужное место AJAX-контента.",
     "type": "cakephp-plugin",
     "home": "https://github.com/valeriy-brunov/insert-paginator",
     "license": "MIT",

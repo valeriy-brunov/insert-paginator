@@ -78,9 +78,10 @@
     if ( isset($attr[0]['contentTrubber']) or empty($attr[0]['contentTrubber']) ) unset($attr[0]['contentTrubber']);
     if ( isset($attr[0]['contentButton']) or empty($attr[0]['contentButton']) ) unset($attr[0]['contentButton']);
     if ( isset($attr[0]['contentHTML']) or empty($attr[0]['contentHTML']) ) unset($attr[0]['contentHTML']);
-    //unset($attr[0]['insertType']);
     unset($attr[0]['insertContent']);
-    // unset($attr[0]['insertButtonTrubber']);
+    if ( isset($attr[0]['insertType']) and $attr[0]['insertType'] == 'load' ) {
+        unset($attr[0]['insertButtonTrubber']);
+    }
 ?>
 
 <brunov-insert-paginator<?= $this->Webcomp->addattr( $attr[0] ) ?>>

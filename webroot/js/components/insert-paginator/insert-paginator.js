@@ -42,15 +42,6 @@ export default class InsertPaginator extends HTMLElement {
     }
 
     /**
-     * Клонируем с шаблона содержимое.
-     */
-    /*cloneContent() {
-        const template = this.querySelector( '.insert-paginator' );
-        const clone = template.content.cloneNode( true );
-        this.root.appendChild( clone );
-    }*/
-
-    /**
      * Все содержимое переносим в теневую модель, оставляя тег <template> пустым.
      */
     moveContent() {
@@ -294,7 +285,29 @@ export default class InsertPaginator extends HTMLElement {
                 else if ( mythis.insertType == 'load' ) {
                     mythis.classButTr = null;
                     let replace = mythis.root.querySelector('.replace');
+                    let dateRegexp = /<(?<wc>brunov(\-[a-z]*){1,}){1,}/gi;
+                    let results = html.matchAll( dateRegexp );
+                    let name = [];
+                    let i = 0;
+                    for (let result of results) {
+                        name[i] = result.groups;
+                        i++;
+                    }
                     replace.outerHTML = html;
+                    for (i = 0; i < name.length; i++) {
+                        if ( !customElements.get( name[i].wc ) ) {
+                            let tag = mythis.root.querySelector( name[i].wc );
+                            if ( tag.hasAttribute('jsload') ) {
+                                let valJsLoad = tag.getAttribute('jsload');
+                                let head = document.getElementsByTagName('head')[0];
+                                let script = document.createElement('script');
+                                script.src = valJsLoad;
+                                script.type = 'module';
+                                head.appendChild( script );
+                                tag.removeAttribute('jsload');
+                            }
+                        }
+                    }
                 }
             },
             error: function( status, statusText ) {},

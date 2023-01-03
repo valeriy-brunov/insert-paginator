@@ -283,31 +283,34 @@ export default class InsertPaginator extends HTMLElement {
                     }
                 }
                 else if ( mythis.insertType == 'load' ) {
-                    mythis.classButTr = null;
                     let replace = mythis.root.querySelector('.replace');
                     let dateRegexp = /<(?<wc>brunov(\-[a-z]*){1,}){1,}/gi;
                     let results = html.matchAll( dateRegexp );
-                    let name = [];
+                    let name_= [];
                     let i = 0;
                     for (let result of results) {
-                        name[i] = result.groups;
+                        name_[i] = result.groups;
                         i++;
                     }
+                    let name = [...new Set(name_)];
                     replace.outerHTML = html;
                     for (i = 0; i < name.length; i++) {
+                        let tags = mythis.root.querySelectorAll( name[i].wc );
                         if ( !customElements.get( name[i].wc ) ) {
-                            let tag = mythis.root.querySelector( name[i].wc );
-                            if ( tag.hasAttribute('jsload') ) {
-                                let valJsLoad = tag.getAttribute('jsload');
+                            if ( tags[0].hasAttribute('jsload') ) {
+                                let valJsLoad = tags[0].getAttribute('jsload');
                                 let head = document.getElementsByTagName('head')[0];
                                 let script = document.createElement('script');
                                 script.src = valJsLoad;
                                 script.type = 'module';
                                 head.appendChild( script );
-                                tag.removeAttribute('jsload');
                             }
                         }
+                        for (let tag of tags) {
+                            tag.removeAttribute('jsload');
+                        }
                     }
+                    mythis.classButTr = null;
                 }
             },
             error: function( status, statusText ) {},

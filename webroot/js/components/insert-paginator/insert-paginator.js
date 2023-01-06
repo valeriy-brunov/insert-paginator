@@ -152,6 +152,33 @@ export default class InsertPaginator extends HTMLElement {
     }
 
     /**
+     * Атрибут "progress".
+     * 
+     * Длина прогресс-бара.
+     */
+    set progress( val ) {
+        this.setAttribute( 'progress', val );
+    }
+    get insertType() {
+        if ( this.hasAttribute( 'progress' ) ) {
+            return this.getAttribute( 'progress' );
+        }
+        else return InsertPaginator.DEFAULT_PROGRESS;
+    }
+    static get DEFAULT_PROGRESS() {
+        return false;
+    }
+
+    /**
+     * Свойство стиля "progressWidth".
+     * 
+     * Длина прогресс-бара.
+     */
+    set progressWidth( val ) {
+        this.dom.progressBar.style.width = val + 'px';
+    }
+
+    /**
      * Определяем, за какими атрибутами необходимо наблюдать.
      */
     static get observedAttributes() {
@@ -312,6 +339,9 @@ export default class InsertPaginator extends HTMLElement {
                     }
                     mythis.classButTr = null;
                 }
+            },
+            progress: function( loaded, total ) {
+                
             },
             error: function( status, statusText ) {},
             errorConnect: function() {},

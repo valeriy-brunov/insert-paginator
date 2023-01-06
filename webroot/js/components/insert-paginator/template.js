@@ -12,7 +12,7 @@ export default {
      */
     mapDom( scope ) {
         return {
-            oneDiv: scope.querySelector('.ddt'),// Для примера.
+            progressBar: scope.querySelector('.progress'),
         }
     },
 

@@ -22,6 +22,9 @@
     if ( !isset($attr[0]['insertButtonTrubber']) ) {
         $attr[0]['insertButtonTrubber'] = 'out';
     }
+    if ( isset($attr[0]['insertType']) and $attr[0]['insertType'] == 'progress-load' ) {
+        $attr[0]['progress'] = '0';
+    }
 ?>
 
 <?php $this->start('wc-insert-paginator') ?>
@@ -68,8 +71,8 @@
 
 <?php
     // Служебные атрибуты:
-    if ( isset($attr[0]['insertType']) and $attr[0]['insertType'] == 'load' ) {
-        $attr[0]['class']  = 'tr';
+    if ( isset($attr[0]['insertType']) and ($attr[0]['insertType'] == 'load' or $attr[0]['insertType'] == 'progress-load') ) {
+        $attr[0]['class'] = 'tr';
     }
 ?>
 
@@ -79,13 +82,16 @@
     if ( isset($attr[0]['contentButton']) or empty($attr[0]['contentButton']) ) unset($attr[0]['contentButton']);
     if ( isset($attr[0]['contentHTML']) or empty($attr[0]['contentHTML']) ) unset($attr[0]['contentHTML']);
     unset($attr[0]['insertContent']);
-    if ( isset($attr[0]['insertType']) and $attr[0]['insertType'] == 'load' ) {
+    if ( isset($attr[0]['insertType']) and ($attr[0]['insertType'] == 'load' or $attr[0]['insertType'] == 'progress-load') ) {
         unset($attr[0]['insertButtonTrubber']);
     }
 ?>
 
 <brunov-insert-paginator<?= $this->Webcomp->addattr( $attr[0] ) ?>>
     <template class="insert-paginator">
+        <?php if ( isset($attr[0]['insertType']) and $attr[0]['insertType'] == 'progress-load' ): ?>
+            <div class="progress"></div>
+        <?php endif; ?>
         <?= $attr[0]['contentHTML'] ?? '' ?>
         <?= $this->Webcomp->filterScript( $this->fetch('wc-insert-paginator'), $attr[0]['js'] ) ?>
     </template>

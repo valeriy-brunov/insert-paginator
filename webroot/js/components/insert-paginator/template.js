@@ -31,6 +31,14 @@ export default {
             :host(.tr) .insert-tr {
                 display: block;
             }
+            :host(.tr) .replace {
+                display: none;
+            }
+            :host .progress {
+                width: 0;
+                height: 3px;
+                background-color: green;
+            }
         </style>`;
     },
 }

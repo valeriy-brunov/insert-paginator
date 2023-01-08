@@ -38,7 +38,7 @@ export default class InsertPaginator extends HTMLElement {
 
         // Подключаем кеширование:
         this.dom = Template.mapDom( this.root );
-        this.cashe = this.casheValue();
+        //this.cashe = this.casheValue();
     }
 
     /**
@@ -48,18 +48,18 @@ export default class InsertPaginator extends HTMLElement {
         const template = this.querySelector( '.insert-paginator' );
         const node = document.createElement('div');
         node.className = 'wrap';
-        node.appendChild( template.content );
-        this.root.appendChild( node );
+        node.append( template.content );
+        this.root.append( node );
     }
 
     /**
      * Кеширование значений или объектов.
      */
-    casheValue() {
+    /*casheValue() {
         return {
             valueFirstTel: 'Значение или объект',
         }
-    }
+    }*/
 
     /**
      * Атрибут "eventPaginator".
@@ -154,46 +154,65 @@ export default class InsertPaginator extends HTMLElement {
     /**
      * Атрибут "progress".
      * 
-     * Длина прогресс-бара.
+     * Длина прогресс-бара в %.
      */
     set progress( val ) {
         this.setAttribute( 'progress', val );
     }
-    get insertType() {
+    get progress() {
         if ( this.hasAttribute( 'progress' ) ) {
             return this.getAttribute( 'progress' );
         }
         else return InsertPaginator.DEFAULT_PROGRESS;
     }
     static get DEFAULT_PROGRESS() {
-        return false;
+        return 0;
     }
 
     /**
      * Свойство стиля "progressWidth".
      * 
-     * Длина прогресс-бара.
+     * Стиль длины прогресс-бара.
      */
     set progressWidth( val ) {
-        this.dom.progressBar.style.width = val + 'px';
+        this.dom.progressBar.style.width = val + '%';
     }
 
     /**
      * Определяем, за какими атрибутами необходимо наблюдать.
      */
     static get observedAttributes() {
-        return ['url'];
+        return ['url', 'progress'];
     }
 
     /**
      * Следим за изменениями этих атрибутов и отвечаем соответственно.
      */
     attributeChangedCallback( name, oldVal, newVal ) {
-        if ( name == 'url' && this.insertType == 'load' && oldVal ) {
+        if ( name == 'url' && (this.insertType == 'load' || this.insertType == 'progress-load') && oldVal ) {
             if ( this.url ) {
-                    this.valuePage = this.url;
-                    this.query();
-                }
+                this.valuePage = this.url;
+                this.query();
+            }
+        }
+        else if ( name == 'progress' && this.insertType == 'progress-load' && oldVal ) {
+            let mythis = this;
+            if ( this.timerId ) clearTimeout( this.timerId );
+            this.timerId = setTimeout(
+                function move() {
+                    if ( !mythis.current ) mythis.current = 1;
+                    if ( mythis.current < 100 ) {
+                        mythis.current++;
+                        mythis.progressWidth = mythis.current;
+                        mythis.timerId = setTimeout( move, 10 );
+                    }
+                    else {
+                        clearTimeout( mythis.timerId );
+                        mythis.progressWidth = 0;
+                        mythis.current = 0;
+                    }
+                }, 10
+            );
         }
     }
 
@@ -204,6 +223,7 @@ export default class InsertPaginator extends HTMLElement {
     connectedCallback() {
         switch( this.insertType ) {
             case 'load':
+            case 'progress-load':
                 if ( this.url ) {
                     this.valuePage = this.url;
                     this.query();
@@ -295,8 +315,11 @@ export default class InsertPaginator extends HTMLElement {
             url: mythis.valuePage,
             beforeSend: function() {
                 mythis.triggerAjax = true;
-                if ( mythis.insertType == 'paginator' || mythis.insertType == 'load' ) {
+                if ( mythis.insertType == 'paginator' || mythis.insertType == 'load' || mythis.insertType == 'progress-load' ) {
                     mythis.classButTr = 'tr';
+                }
+                if ( mythis.insertType == 'progress-load' ) {
+                    mythis.progress = 0;
                 }
             },
             success: function(html) {
@@ -309,7 +332,7 @@ export default class InsertPaginator extends HTMLElement {
                         if ( mythis.getIntoArea() ) mythis.query();
                     }
                 }
-                else if ( mythis.insertType == 'load' ) {
+                else if ( mythis.insertType == 'load' || mythis.insertType == 'progress-load' ) {
                     let replace = mythis.root.querySelector('.replace');
                     let dateRegexp = /<(?<wc>brunov(\-[a-z]*){1,}){1,}/gi;
                     let results = html.matchAll( dateRegexp );
@@ -341,7 +364,10 @@ export default class InsertPaginator extends HTMLElement {
                 }
             },
             progress: function( loaded, total ) {
-                
+                if ( mythis.insertType == 'progress-load' ) {
+                    if ( loaded == total ) mythis.progress = 100;
+                    else mythis.progress = Math.floor( loaded / total * 100 );
+                }
             },
             error: function( status, statusText ) {},
             errorConnect: function() {},

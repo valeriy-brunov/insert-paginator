@@ -40,6 +40,10 @@ bin/cake plugin load Insert-paginator
 
 [Смотреть описание вставки типа load](#load)
 
+`progress-load` - при загрузке страницы показывается труббер прогресс-бар загрузки, а потом появляется контент.
+
+[Смотреть описание вставки типа progress-load](#progressload)
+
 `paginator` - при загрузке страницы часть контента пагинации будет показана сразу. Дальше пагинацию
 можно продолжить через кнопку или ссылку (по умолчанию).
 
@@ -209,7 +213,6 @@ class IndexController extends AppController
 <?php echo
     $this->Webcomp->insertPaginator([
         'insertType' => 'load',
-        'progress' => true,// Отслеживать загрузку в виде прогресс-бара.
         'url' => 'Адрес AJAX-запроса. Например, /gotovo/index/test',
         'contentTrubber' => 'Html вёрстка труббера. Внешний слой труббера должен содержать класс "insert-tr".',
     ]);
@@ -248,7 +251,28 @@ $this->viewBuilder()->setLayout('ajax');
 </div>
 ```
 
+<a name="progressload"></a>
+> :memo: __Режим `progress-load`__
 
+```php
+<?php echo
+    $this->Webcomp->insertPaginator([
+        'insertType' => 'progress-load',
+        'url' => 'Адрес AJAX-запроса. Например, /gotovo/index/test',
+        'contentTrubber' => 'Html вёрстка труббера. Внешний слой труббера должен содержать класс "insert-tr".',
+    ]);
+?>
+```
 
+Шаблон для копирования и вставки в ваш php-код:
 
+```php
+<?php echo
+    $this->Webcomp->insertPaginator([
+        'insertType' => 'progress-load',
+        'url' => '',
+        'contentTrubber' => '',
+    ]);
+?>
+```
 

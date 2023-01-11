@@ -24,6 +24,7 @@
     }
     if ( isset($attr[0]['insertType']) and $attr[0]['insertType'] == 'progress-load' ) {
         $attr[0]['progress'] = '0';
+        $attr[0]['totalLoadScript'] = '0';
     }
 ?>
 

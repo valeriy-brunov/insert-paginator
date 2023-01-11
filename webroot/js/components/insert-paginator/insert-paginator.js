@@ -179,10 +179,29 @@ export default class InsertPaginator extends HTMLElement {
     }
 
     /**
+     * Атрибут "totalLoadScript".
+     *
+     * Работает только для режима "progress-load".
+     * Указывает сколько скриптов js осталось загрузить, чтобы показать труббер.
+     */
+    set totalLoadScript( val ) {
+        this.setAttribute( 'totalLoadScript', val );
+    }
+    get totalLoadScript() {
+        if ( this.hasAttribute( 'totalLoadScript' ) ) {
+            return this.getAttribute( 'totalLoadScript' );
+        }
+        else return InsertPaginator.DEFAULT_TOTALLOADSCRIPT;
+    }
+    static get DEFAULT_TOTALLOADSCRIPT() {
+        return 0;
+    }
+
+    /**
      * Определяем, за какими атрибутами необходимо наблюдать.
      */
     static get observedAttributes() {
-        return ['url', 'progress'];
+        return ['url', 'progress', 'totalloadscript'];
     }
 
     /**
@@ -213,6 +232,11 @@ export default class InsertPaginator extends HTMLElement {
                     }
                 }, 10
             );
+        }
+        else if ( name == 'totalloadscript' && this.insertType == 'progress-load' && oldVal ) {
+            if ( newVal == 0 ) {
+                this.classButTr = null;
+            }
         }
     }
 
@@ -344,23 +368,31 @@ export default class InsertPaginator extends HTMLElement {
                     }
                     let name = [...new Set(name_)];
                     replace.outerHTML = html;
+                    let k = 0;
+                    let scripts = [];
                     for (i = 0; i < name.length; i++) {
                         let tags = mythis.root.querySelectorAll( name[i].wc );
                         if ( !customElements.get( name[i].wc ) ) {
                             if ( tags[0].hasAttribute('jsload') ) {
                                 let valJsLoad = tags[0].getAttribute('jsload');
                                 let head = document.getElementsByTagName('head')[0];
-                                let script = document.createElement('script');
-                                script.src = valJsLoad;
-                                script.type = 'module';
-                                head.appendChild( script );
+                                scripts[k] = document.createElement('script');
+                                scripts[k].src = valJsLoad;
+                                scripts[k].type = 'module';
+                                head.appendChild( scripts[k] );
+                                k++;
                             }
                         }
                         for (let tag of tags) {
                             tag.removeAttribute('jsload');
                         }
                     }
-                    mythis.classButTr = null;
+                    if ( k > 0 ) {
+                        mythis.totalLoadScript = k;
+                        for ( let script of scripts ) {
+                            script.onload = () => mythis.totalLoadScript--;
+                        }
+                    }
                 }
             },
             progress: function( loaded, total ) {
